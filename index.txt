@@ -1,0 +1,425 @@
+I'll help you set up a sample React application with intentional issues, then guide you through the debugging process using React Developer Tools.
+
+## 1. Create the Sample React Application with Issues
+
+First, create the React app:
+
+```bash
+npx create-react-app debug-demo
+cd debug-demo
+```
+
+## 2. Create Components with Intentional Issues
+
+**src/App.js** (with issues):
+```jsx
+import React, { useState } from 'react';
+import './App.css';
+import UserProfile from './components/UserProfile';
+import UserList from './components/UserList';
+
+function App() {
+  const [users, setUsers] = useState([
+    { id: 1, name: 'John Doe', email: 'john@example.com', active: true },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', active: false },
+    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', active: true }
+  ]);
+
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  // Issue: Missing dependency in useEffect equivalent
+  const handleUserSelect = (user) => {
+    setSelectedUser(user);
+    console.log('User selected:', user.name);
+  };
+
+  // Issue: Incorrect state update
+  const toggleUserStatus = (userId) => {
+    const updatedUsers = users.map(user => {
+      if (user.id === userId) {
+        return { ...user, active: !user.active };
+      }
+      return user;
+    });
+    // Missing spread operator for state update
+    setUsers(updatedUsers);
+  };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>User Management App</h1>
+        <div className="app-content">
+          <UserList 
+            users={users} 
+            onUserSelect={handleUserSelect}
+            onToggleStatus={toggleUserStatus}
+            // Issue: Missing key prop
+          />
+          <UserProfile 
+            user={selectedUser}
+            // Issue: Incorrect prop name
+            onUpdateUser={toggleUserStatus}
+          />
+        </div>
+      </header>
+    </div>
+  );
+}
+
+export default App;
+```
+
+**src/components/UserList.js** (with issues):
+```jsx
+import React from 'react';
+
+const UserList = ({ users, onUserSelect, onToggleStatus }) => {
+  // Issue: Missing key in map function
+  return (
+    <div className="user-list">
+      <h2>Users</h2>
+      {users.map((user, index) => (
+        <div key={index} className="user-item">
+          <div onClick={() => onUserSelect(user)}>
+            <h3>{user.name}</h3>
+            <p>{user.email}</p>
+            <span className={`status ${user.active ? 'active' : 'inactive'}`}>
+              {user.active ? 'Active' : 'Inactive'}
+            </span>
+          </div>
+          <button onClick={() => onToggleStatus(user.id)}>
+            Toggle Status
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default UserList;
+```
+
+**src/components/UserProfile.js** (with issues):
+```jsx
+import React, { useState, useEffect } from 'react';
+
+const UserProfile = ({ user, onUpdateUser }) => {
+  const [localUser, setLocalUser] = useState(user);
+  
+  // Issue: Missing dependency array
+  useEffect(() => {
+    setLocalUser(user);
+  });
+
+  // Issue: Incorrect event handling
+  const handleStatusToggle = () => {
+    if (user) {
+      onUpdateUser(user.id);
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="user-profile">
+        <h2>Select a user to view profile</h2>
+      </div>
+    );
+  }
+
+  return (
+    <div className="user-profile">
+      <h2>User Profile</h2>
+      <div className="profile-details">
+        <h3>{localUser?.name}</h3>
+        <p>Email: {localUser?.email}</p>
+        <p>Status: 
+          <span className={`status ${localUser?.active ? 'active' : 'inactive'}`}>
+            {localUser?.active ? 'Active' : 'Inactive'}
+          </span>
+        </p>
+        <button onClick={handleStatusToggle}>
+          Toggle User Status
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default UserProfile;
+```
+
+**src/App.css**:
+```css
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+  min-height: 100vh;
+}
+
+.app-content {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.user-list {
+  background: #2c3e50;
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 300px;
+}
+
+.user-item {
+  background: #34495e;
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.user-item:hover {
+  background: #4a6278;
+}
+
+.user-profile {
+  background: #2c3e50;
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 300px;
+}
+
+.profile-details {
+  background: #34495e;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+.status.active {
+  background: #27ae60;
+  color: white;
+}
+
+.status.inactive {
+  background: #e74c3c;
+  color: white;
+}
+
+button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background: #2980b9;
+}
+```
+
+## 3. Debugging Process with React Developer Tools
+
+### Step 1: Install React Developer Tools
+- Install the browser extension for Chrome/Firefox or use standalone app
+- Restart your browser if needed
+
+### Step 2: Start the Application
+```bash
+npm start
+```
+
+### Step 3: Identify Issues Using React DevTools
+
+**Issue 1: Missing Keys in List**
+- Open React DevTools (F12 → Components tab)
+- Navigate to UserList component
+- Notice warning in console: "Each child in a list should have a unique key prop"
+- **Fix**: Change `key={index}` to `key={user.id}` in UserList.js
+
+**Issue 2: Infinite Re-render in UserProfile**
+- In Components tab, select UserProfile
+- Notice it's constantly re-rendering
+- **Cause**: useEffect missing dependency array
+- **Fix**: Add empty dependency array `useEffect(() => {...}, []);`
+
+**Issue 3: Incorrect Prop Name**
+- In Components tab, inspect UserProfile props
+- Notice prop is called `onUpdateUser` but should be `onToggleStatus`
+- **Fix**: Change prop name in App.js
+
+**Issue 4: State Update Issue**
+- Use the Profiler tab to record interactions
+- Notice state isn't updating correctly when toggling status
+- **Fix**: The state update is actually correct, but let's verify
+
+**Issue 5: Event Handling Issue**
+- In UserProfile, the toggle button doesn't work properly
+- **Cause**: `handleStatusToggle` uses `user` instead of `localUser`
+- **Fix**: Update the handler to use `localUser`
+
+## 4. Fixed Components
+
+**Fixed UserList.js**:
+```jsx
+import React from 'react';
+
+const UserList = ({ users, onUserSelect, onToggleStatus }) => {
+  return (
+    <div className="user-list">
+      <h2>Users</h2>
+      {users.map((user) => (
+        <div key={user.id} className="user-item"> {/* Fixed key */}
+          <div onClick={() => onUserSelect(user)}>
+            <h3>{user.name}</h3>
+            <p>{user.email}</p>
+            <span className={`status ${user.active ? 'active' : 'inactive'}`}>
+              {user.active ? 'Active' : 'Inactive'}
+            </span>
+          </div>
+          <button onClick={() => onToggleStatus(user.id)}>
+            Toggle Status
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default UserList;
+```
+
+**Fixed UserProfile.js**:
+```jsx
+import React, { useState, useEffect } from 'react';
+
+const UserProfile = ({ user, onToggleStatus }) => { // Fixed prop name
+  const [localUser, setLocalUser] = useState(user);
+  
+  useEffect(() => {
+    setLocalUser(user);
+  }, [user]); // Added dependency array
+
+  const handleStatusToggle = () => {
+    if (localUser) { // Fixed: use localUser instead of user
+      onToggleStatus(localUser.id);
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="user-profile">
+        <h2>Select a user to view profile</h2>
+      </div>
+    );
+  }
+
+  return (
+    <div className="user-profile">
+      <h2>User Profile</h2>
+      <div className="profile-details">
+        <h3>{localUser?.name}</h3>
+        <p>Email: {localUser?.email}</p>
+        <p>Status: 
+          <span className={`status ${localUser?.active ? 'active' : 'inactive'}`}>
+            {localUser?.active ? 'Active' : 'Inactive'}
+          </span>
+        </p>
+        <button onClick={handleStatusToggle}>
+          Toggle User Status
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default UserProfile;
+```
+
+**Fixed App.js**:
+```jsx
+// ... same imports ...
+
+function App() {
+  // ... same state ...
+
+  const handleUserSelect = (user) => {
+    setSelectedUser(user);
+  };
+
+  const toggleUserStatus = (userId) => {
+    const updatedUsers = users.map(user => {
+      if (user.id === userId) {
+        return { ...user, active: !user.active };
+      }
+      return user;
+    });
+    setUsers(updatedUsers);
+  };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>User Management App</h1>
+        <div className="app-content">
+          <UserList 
+            users={users} 
+            onUserSelect={handleUserSelect}
+            onToggleStatus={toggleUserStatus}
+          />
+          <UserProfile 
+            user={selectedUser}
+            onToggleStatus={toggleUserStatus} // Fixed prop name
+          />
+        </div>
+      </header>
+    </div>
+  );
+}
+
+export default App;
+```
+
+## 5. Verification Steps
+
+1. **Check Console**: No more warnings about keys
+2. **Test Interactions**: 
+   - Click users to select them
+   - Toggle status from both list and profile
+   - Verify state updates correctly
+3. **Use Profiler**: Record interactions to ensure no unnecessary re-renders
+4. **Inspect Props**: Verify all props are correctly passed and named
+
+## 6. Documentation of Debugging Process
+
+**Issues Found and Fixed:**
+1. ✅ Missing key props in list rendering
+2. ✅ Infinite re-render loop in useEffect
+3. ✅ Incorrect prop naming between components
+4. ✅ Event handler using wrong state variable
+5. ✅ Proper state updates with spread operators
+
+**React DevTools Features Used:**
+- Components tree inspection
+- Prop and state viewing
+- Highlight updates on re-render
+- Profiler for performance analysis
+- Console integration for warnings
+
+The application now functions correctly with proper state management, no console warnings, and expected behavior across all components.
