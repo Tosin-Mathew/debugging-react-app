@@ -1,0 +1,81 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+  min-height: 100vh;
+}
+
+.app-content {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.user-list {
+  background: #2c3e50;
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 300px;
+}
+
+.user-item {
+  background: #34495e;
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.user-item:hover {
+  background: #4a6278;
+}
+
+.user-profile {
+  background: #2c3e50;
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 300px;
+}
+
+.profile-details {
+  background: #34495e;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+.status.active {
+  background: #27ae60;
+  color: white;
+}
+
+.status.inactive {
+  background: #e74c3c;
+  color: white;
+}
+
+button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background: #2980b9;
+}
